@@ -1,0 +1,4 @@
+__pycache__
+books.db
+users.db
+venv/
