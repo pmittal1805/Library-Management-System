@@ -99,7 +99,7 @@ def book():
     conn = sqlite3.connect('books.db')
     c = conn.cursor()
 
-    q = request.args.get('search')
+    q = request.args.get('search') # Receive String through URL
 
     if q:
         query = f"%{q}%"   # here %{string}% = word in any string 
@@ -115,7 +115,6 @@ def book():
     book_data = c.fetchall()
     conn.close()
     return render_template('books.html', books = book_data) #books variable = stores book_data
-
 
 @app.route('/edit_book/<int:id>', methods = ['GET','POST'])
 def edit_book(id):
