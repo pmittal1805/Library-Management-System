@@ -7,7 +7,7 @@ import sqlite3
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/") # index.html Home Page route
 def home():
     if 'user' in session:
         return redirect('/dashboard')
@@ -15,7 +15,7 @@ def home():
 
 @app.route("/signup", methods=['GET','POST'])
 def signup():
-    if request.method == 'POST':        #POST method:-check & transfer data if user subitted.. 
+    if request.method == 'POST':        #POST method:-check & transfer data if user submitted.. 
         name = request.form['name']     # retrieve user data &  store in DB
         email = request.form['email']
         password = request.form['password']
@@ -23,6 +23,7 @@ def signup():
         conn = sqlite3.connect('users.db') #open or connect with DB
         c = conn.cursor()    #object which operate DB & execute Queries
         #prevent sql injection by using parameterized Query
+        #Means it allows input as "Data" only instead of any "Sql Query"
         c.execute("INSERT INTO users(name, email, password) values (?, ?, ?)",
                   (name, email, password))
         conn.commit()
@@ -32,7 +33,7 @@ def signup():
     
     return render_template("signup.html")  #GET method :- user can put their data 
 
-app.secret_key = "secretkey123"
+app.secret_key = "secretkey123" #for session data access
 
 @app.route('/login',methods = ['GET','POST'])
 def login():
@@ -64,7 +65,7 @@ def dashboard():
 
 @app.route('/add_books',methods=['GET','POST'])
 def add_books():
-    if 'user' not in session:
+    if 'user' not in session: #when user request again after login then cookie checks user data if it is in session then same page
         return redirect('/login')
     
     if request.method == 'POST':
@@ -100,7 +101,7 @@ def book():
     q = request.args.get('search')
 
     if q:
-        query = f"%{q}%"
+        query = f"%{q}%"   # here %{string}% = word in any string 
         c.execute('''SELECT * FROM books WHERE
                   title LIKE ? OR
                   author LIKE ? OR
@@ -136,7 +137,7 @@ def edit_book(id):
         conn = sqlite3.connect('books.db')
         c = conn.cursor()
         c.execute('SELECT * FROM books WHERE id=?',(id,))
-        edit_book = c.fetchone()
+        edit_book = c.fetchone() 
         conn.close()
         return render_template('edit_book.html',book = edit_book)
 
