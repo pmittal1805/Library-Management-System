@@ -81,6 +81,7 @@ def add_books():
                   (title, author, genre, isbn, year))
         conn.commit()
         conn.close()
+        flash("Book Added Successfully!",'success')
         return redirect('/books')
     return render_template('add_books.html')
 
