@@ -164,23 +164,20 @@ def issue_book(id):
     issue_c = issue_conn.cursor()
 
     main_c.execute('SELECT * FROM books WHERE id=?',(id,))
-    main_data = main_c.fetchone()
+    main_data = main_c.fetchone() # fetch book row which want to copy in issue
 
     issue_c.execute('SELECT * FROM issued_books WHERE id = ?',(id,))
-    exist_book = issue_c.fetchone()
+    exist_book = issue_c.fetchone() # check this id exist or not
 
-    if exist_book :
+    if exist_book : 
         flash("Book Already Issued!",'danger')
     else:
         issue_c.execute('INSERT INTO issued_books VALUES (?, ?, ?, ?, ?, ?)',main_data)
-        issue_conn.commit()
-    
-        issue_c.execute('SELECT * FROM issued_books')
-        issue_data = issue_c.fetchall()
-
+        issue_conn.commit() #insert main data in issued_books table
         main_conn.close()
         issue_conn.close()
         flash("Books Issued Successfully!",'success')
+
     return redirect('/issued_book')
 
 @app.route('/issued_book')
@@ -189,10 +186,10 @@ def issued_book():
         return redirect('/login')
     conn = sqlite3.connect('issued_books.db')
     c = conn.cursor()
-    q = request.args.get('issue_search')
+    q = request.args.get('issue_search') # search Query
 
     if q:
-        query = f"%{q}%"
+        query = f"%{q}%" # check query in string
         c.execute('''SELECT * FROM issued_books WHERE
                   title LIKE ? OR
                   author LIKE ? OR
@@ -201,8 +198,8 @@ def issued_book():
                   year LIKE ? ''',
                   (query, query, query, query, query))
     else:
-        c.execute('SELECT * FROM issued_books')
-    issued_book = c.fetchall()
+        c.execute('SELECT * FROM issued_books') 
+    issued_book = c.fetchall() # fetch all 1.seached data or 2.all table data
     conn.close()
     return render_template('issued_books.html', books = issued_book)
 
