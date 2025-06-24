@@ -2,3 +2,4 @@ __pycache__
 books.db
 users.db
 venv/
+issued_books.db

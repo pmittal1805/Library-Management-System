@@ -153,7 +153,66 @@ def delete_book(id):
     flash("Book Deleted Successfully!",'danger')
     return redirect('/books')
 
+@app.route('/issue_book/<int:id>')
+def issue_book(id):
+    if 'user' not in session:
+        return redirect('/login')
+    main_conn = sqlite3.connect('books.db')
+    issue_conn = sqlite3.connect('issued_books.db')
+    main_c = main_conn.cursor()
+    issue_c = issue_conn.cursor()
 
+    main_c.execute('SELECT * FROM books WHERE id=?',(id,))
+    main_data = main_c.fetchone()
+
+    if main_data :
+        issue_c.execute('INSERT INTO issued_books VALUES (?, ?, ?, ?, ?, ?)',main_data)
+        issue_conn.commit()
+    else:
+        print("DATA NOT FOUND !!")
+    
+    issue_c.execute('SELECT * FROM issued_books')
+    issue_data = issue_c.fetchall()
+
+    main_conn.close()
+    issue_conn.close()
+    flash("Books Issued Successfully!",'success')
+    return redirect('/issued_book')
+
+@app.route('/issued_book')
+def issued_book():
+    if 'user' not in session:
+        return redirect('/login')
+    conn = sqlite3.connect('issued_books.db')
+    c = conn.cursor()
+    q = request.args.get('issue_search')
+
+    if q:
+        query = f"%{q}%"
+        c.execute('''SELECT * FROM issued_books WHERE
+                  title LIKE ? OR
+                  author LIKE ? OR
+                  genre LIKE ? OR
+                  isbn LIKE ? OR
+                  year LIKE ? ''',
+                  (query, query, query, query, query))
+    else:
+        c.execute('SELECT * FROM issued_books')
+    issued_book = c.fetchall()
+    conn.close()
+    return render_template('issued_books.html', books = issued_book)
+
+@app.route('/return_book/<int:id>')
+def remove_book(id):
+    if 'user' not in session:
+        return redirect('/login')
+    conn = sqlite3.connect('issued_books.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM issued_books WHERE id=?',(id,))
+    conn.commit()
+    conn.close()
+    flash("Book returned Successfully!",'success')
+    return redirect('/issued_book')
 
 if __name__ == '__main__':
     app.run(debug=True)
