@@ -157,6 +157,7 @@ def delete_book(id):
 def issue_book(id):
     if 'user' not in session:
         return redirect('/login')
+    
     main_conn = sqlite3.connect('books.db')
     issue_conn = sqlite3.connect('issued_books.db')
     main_c = main_conn.cursor()
@@ -165,18 +166,21 @@ def issue_book(id):
     main_c.execute('SELECT * FROM books WHERE id=?',(id,))
     main_data = main_c.fetchone()
 
-    if main_data :
+    issue_c.execute('SELECT * FROM issued_books WHERE id = ?',(id,))
+    exist_book = issue_c.fetchone()
+
+    if exist_book :
+        flash("Book Already Issued!",'danger')
+    else:
         issue_c.execute('INSERT INTO issued_books VALUES (?, ?, ?, ?, ?, ?)',main_data)
         issue_conn.commit()
-    else:
-        print("DATA NOT FOUND !!")
     
-    issue_c.execute('SELECT * FROM issued_books')
-    issue_data = issue_c.fetchall()
+        issue_c.execute('SELECT * FROM issued_books')
+        issue_data = issue_c.fetchall()
 
-    main_conn.close()
-    issue_conn.close()
-    flash("Books Issued Successfully!",'success')
+        main_conn.close()
+        issue_conn.close()
+        flash("Books Issued Successfully!",'success')
     return redirect('/issued_book')
 
 @app.route('/issued_book')
