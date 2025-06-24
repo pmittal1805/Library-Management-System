@@ -28,7 +28,7 @@ def signup():
                   (name, email, password))
         conn.commit()
         conn.close()
-
+        flash("Sign up Successfully!",'success')
         return redirect('/')
     
     return render_template("signup.html")  #GET method :- user can put their data 
@@ -49,7 +49,7 @@ def login():
 
         if user:
             session['user'] = user[1] #user[1] = name
-            #flash("Login Successfully !","success")
+            flash("Login Successfully !","success")
             return redirect('/dashboard')
         else:
             flash("Invalid Email or Password !","danger")
@@ -88,7 +88,7 @@ def add_books():
 @app.route('/logout')
 def logout():
     session.pop('user', None)
-    # flash("Logged out Successfully!","info")
+    flash("Logged out Successfully!",'success')
     return redirect('/')
 
 @app.route('/books')
@@ -131,7 +131,7 @@ def edit_book(id):
                   (title, author, genre, isbn, year, id))
         conn.commit()
         conn.close()
-        # flash("Book Updated Successfully!","success")
+        flash("Book Updated Successfully!","success")
         return redirect('/books')
     else:
         conn = sqlite3.connect('books.db')
@@ -150,6 +150,7 @@ def delete_book(id):
     c.execute('DELETE FROM books WHERE id=?',(id,))
     conn.commit()
     conn.close()
+    flash("Book Deleted Successfully!",'danger')
     return redirect('/books')
 
 

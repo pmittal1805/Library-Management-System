@@ -13,14 +13,25 @@
 <body>
     <div class="container mt-5" style="margin-top: 100px;">
         <div class="card shadow-lg border-3 rounded-4 p-4" style="margin: 100px auto;">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
             <h2 class="text-center">📚 Welcome <b>{{session['user'] }}</b>, in Library Dashboard!</h2>
             <br>
             <!-- <h3>📚 Total Books :- </h3> -->
             <p class="text-center">What would you like to do ?</p>
-            <div class="d-flex justify-content-center gap-3 mt-4"+>
+            <div class="d-flex justify-content-center gap-3 mt-4" +>
                 <a href="/add_books" class="btn btn-outline-primary">➕Add New Books</a>
                 <a href="/books" class="btn btn-outline-success">📖 View Books</a>
-                <a href="/logout" class="btn btn-outline-danger"  onclick="return confirm('Are you sure you want to Logout?');">🚪 Logout</a>
+                <a href="/logout" class="btn btn-outline-danger"
+                    onclick="return confirm('Are you sure you want to Logout?');">🚪 Logout</a>
             </div>
         </div>
     </div>
